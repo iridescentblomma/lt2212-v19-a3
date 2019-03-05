@@ -40,8 +40,6 @@ def get_tokens(file):
         tokens.append(t_p[0])
     return tokens
 
-words = (get_tokens(args.inputfile))
-
 
 def create_ngrams(tokens, n):
     n_grams = ngrams(tokens, n, pad_left=True, pad_right=False, left_pad_symbol="<s>", right_pad_symbol=None)
@@ -54,6 +52,21 @@ def create_vocabulary(wordlist):
     for k,i in enumerate(keys):
         vocabulary[k] = i
     return vocabulary
+
+
+def one_hot_transformer(vocabdict):
+    one_hot_vector_dict = {}
+    for k, v in vocabdict.items():
+        one_hot_vector = [0] * len(vocabdict)
+        one_hot_vector[k] = 1
+        one_hot_vector_dict[v] = one_hot_vector
+    return one_hot_vector_dict
+
+
+#words = (get_tokens(args.inputfile))
+#vocabulary = create_vocabulary(words[:200])
+#one_hot_vectors = one_hot_transformer(vocabulary)
+
 
 
 
