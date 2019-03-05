@@ -51,7 +51,7 @@ def create_vocabulary(wordlist):
     keys = list(set(wordlist))
     for i, k in enumerate(keys):
         vocabulary[k] = i
-    vocabulary["<s"] = len(keys)
+    vocabulary["<s>"] = len(keys)
     return vocabulary
 
 
@@ -67,9 +67,10 @@ def one_hot_transformer(vocabdict):
 def create_one_hot_representations(ngrams_, vector_dict):
     array = []
     for el in ngrams_:
-        print(ngrams)
+        print(ngrams_)
         vector = []
         for w in el[:-1]:
+            print(w)
             vector += vector_dict[w]
         vector.append(el[-1])
         array.append(vector)
@@ -80,12 +81,14 @@ words = (get_tokens(args.inputfile))
 vocabulary = create_vocabulary(words)
 one_hot_vectors = one_hot_transformer(vocabulary)
 n_grams = create_ngrams(words, 3)
-#one_hot_matrix = create_one_hot_representations(n_grams, one_hot_vectors)
+one_hot_matrix = create_one_hot_representations(n_grams, one_hot_vectors)
 
-print(vocabulary)
-print(one_hot_vectors)
-print(n_grams)
-#print(one_hot_matrix)
+#print(vocabulary)
+#print(one_hot_vectors)
+#print(n_grams)
+
+
+print(one_hot_matrix)
 
 
 
