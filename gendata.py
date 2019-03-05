@@ -38,7 +38,7 @@ def get_tokens(file):
     tokens = []
     for t_p in tokens_POS:
         tokens.append(t_p[0])
-    return tokens
+    return tokens[:10]
 
 
 def create_ngrams(tokens, n):
@@ -49,8 +49,9 @@ def create_ngrams(tokens, n):
 def create_vocabulary(wordlist):
     vocabulary = {}
     keys = list(set(wordlist))
-    for k,i in enumerate(keys):
+    for i, k in enumerate(keys):
         vocabulary[k] = i
+    vocabulary["<s"] = len(keys)
     return vocabulary
 
 
@@ -58,14 +59,33 @@ def one_hot_transformer(vocabdict):
     one_hot_vector_dict = {}
     for k, v in vocabdict.items():
         one_hot_vector = [0] * len(vocabdict)
-        one_hot_vector[k] = 1
-        one_hot_vector_dict[v] = one_hot_vector
+        one_hot_vector[v] = 1
+        one_hot_vector_dict[k] = one_hot_vector
     return one_hot_vector_dict
 
 
-#words = (get_tokens(args.inputfile))
-#vocabulary = create_vocabulary(words[:200])
-#one_hot_vectors = one_hot_transformer(vocabulary)
+def create_one_hot_representations(ngrams_, vector_dict):
+    array = []
+    for el in ngrams_:
+        print(ngrams)
+        vector = []
+        for w in el[:-1]:
+            vector += vector_dict[w]
+        vector.append(el[-1])
+        array.append(vector)
+    return array
+
+
+words = (get_tokens(args.inputfile))
+vocabulary = create_vocabulary(words)
+one_hot_vectors = one_hot_transformer(vocabulary)
+n_grams = create_ngrams(words, 3)
+#one_hot_matrix = create_one_hot_representations(n_grams, one_hot_vectors)
+
+print(vocabulary)
+print(one_hot_vectors)
+print(n_grams)
+#print(one_hot_matrix)
 
 
 
