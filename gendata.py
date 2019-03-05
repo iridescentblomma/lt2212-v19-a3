@@ -3,6 +3,8 @@ import glob
 import argparse
 import numpy as np
 import pandas as pd
+import nltk
+from nltk import ngrams
 
 # gendata.py -- Don't forget to put a reasonable amount code comments
 # in so that we better understand what you're doing when we grade!
@@ -37,6 +39,12 @@ def get_tokens(file):
     for t_p in tokens_POS:
         tokens.append(t_p[0])
     return tokens
+
+
+def create_ngrams(tokens, n):
+    n_grams = ngrams(tokens, n, pad_left=True, pad_right=False, left_pad_symbol="<s>", right_pad_symbol=None)
+    return list(n_grams)
+
 
 
 
