@@ -79,14 +79,29 @@ def create_one_hot_representations(ngrams_, vector_dict):
     return representation
 
 
-words = (get_tokens(args.inputfile, args.startline, args.endline))
+
+
+if args.startline > args.endline:
+    print("Starting line has to be smaller than ending line!")
+else:
+    words = (get_tokens(args.inputfile, args.startline, args.endline))
+
+
+if args.ngram < 2:
+    print("Ngrams must at least be trigrams!")
+else:
+    n_grams = create_ngrams(words, args.ngram)
+
 vocabulary = create_vocabulary(words)
 one_hot_vectors = one_hot_transformer(vocabulary)
-n_grams = create_ngrams(words, args.ngram)
-repr = create_one_hot_representations(n_grams, one_hot_vectors)
+repr = pd.DataFrame(create_one_hot_representations(n_grams, one_hot_vectors))
+
+np.set_printoptions(suppress=True, linewidth=np.nan, threshold=np.nan)
+pd.set_option("display.width", 10**1000)
+
+repr.to_csv(args.outputfile, header=None, index=None)
 
 
-print(words)
 
 print("Loading data from file {}.".format(args.inputfile))
 print("Starting from line {}.".format(args.startline))
