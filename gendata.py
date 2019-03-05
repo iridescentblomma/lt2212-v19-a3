@@ -3,8 +3,8 @@ import glob
 import argparse
 import numpy as np
 import pandas as pd
-import nltk
 from nltk import ngrams
+import linecache
 
 # gendata.py -- Don't forget to put a reasonable amount code comments
 # in so that we better understand what you're doing when we grade!
@@ -28,17 +28,20 @@ parser.add_argument("outputfile", type=str,
 args = parser.parse_args()
 
 
-def get_tokens(file):
-    with open(file, "r", encoding="UTF8") as f:
-        text = f.read()
-        raw_tokens = text.split(" ")
-        tokens_POS = []
-        for t in raw_tokens:
-            tokens_POS.append((t.split("/")))
+def get_tokens(file, start, end):
+    text = ""
+    if end is None:
+        end = 1000000
+    for i in range(start, end):
+        text += linecache.getline(file, i)
+    raw_tokens = text.split(" ")
+    tokens_POS = []
+    for t in raw_tokens:
+        tokens_POS.append((t.split("/")))
     tokens = []
     for t_p in tokens_POS:
         tokens.append(t_p[0])
-    return tokens[:10]
+    return tokens
 
 
 def create_ngrams(tokens, n):
@@ -65,33 +68,25 @@ def one_hot_transformer(vocabdict):
 
 
 def create_one_hot_representations(ngrams_, vector_dict):
-    array = []
+    all_vectors = []
     for el in ngrams_:
-        print(ngrams_)
         vector = []
         for w in el[:-1]:
-            print(w)
             vector += vector_dict[w]
         vector.append(el[-1])
-        array.append(vector)
-    return array
+        all_vectors.append(vector)
+    representation = np.array(all_vectors)
+    return representation
 
 
-words = (get_tokens(args.inputfile))
+words = (get_tokens(args.inputfile, args.startline, args.endline))
 vocabulary = create_vocabulary(words)
 one_hot_vectors = one_hot_transformer(vocabulary)
-n_grams = create_ngrams(words, 3)
-one_hot_matrix = create_one_hot_representations(n_grams, one_hot_vectors)
-
-#print(vocabulary)
-#print(one_hot_vectors)
-#print(n_grams)
+n_grams = create_ngrams(words, args.ngram)
+repr = create_one_hot_representations(n_grams, one_hot_vectors)
 
 
-print(one_hot_matrix)
-
-
-
+print(words)
 
 print("Loading data from file {}.".format(args.inputfile))
 print("Starting from line {}.".format(args.startline))
