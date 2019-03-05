@@ -25,6 +25,21 @@ parser.add_argument("outputfile", type=str,
 
 args = parser.parse_args()
 
+
+def get_tokens(file):
+    with open(file, "r", encoding="UTF8") as f:
+        text = f.read()
+        raw_tokens = text.split(" ")
+        tokens_POS = []
+        for t in raw_tokens:
+            tokens_POS.append((t.split("/")))
+    tokens = []
+    for t_p in tokens_POS:
+        tokens.append(t_p[0])
+    return tokens
+
+
+
 print("Loading data from file {}.".format(args.inputfile))
 print("Starting from line {}.".format(args.startline))
 if args.endline:
