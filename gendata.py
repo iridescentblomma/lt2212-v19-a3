@@ -40,11 +40,20 @@ def get_tokens(file):
         tokens.append(t_p[0])
     return tokens
 
+words = (get_tokens(args.inputfile))
+
 
 def create_ngrams(tokens, n):
     n_grams = ngrams(tokens, n, pad_left=True, pad_right=False, left_pad_symbol="<s>", right_pad_symbol=None)
     return list(n_grams)
 
+
+def create_vocabulary(wordlist):
+    vocabulary = {}
+    keys = list(set(wordlist))
+    for k,i in enumerate(keys):
+        vocabulary[k] = i
+    return vocabulary
 
 
 
