@@ -79,8 +79,6 @@ def create_one_hot_representations(ngrams_, vector_dict):
     return representation
 
 
-
-
 if args.startline > args.endline:
     print("Starting line has to be smaller than ending line!")
 else:
@@ -100,7 +98,6 @@ np.set_printoptions(suppress=True, linewidth=np.nan, threshold=np.nan)
 pd.set_option("display.width", 10**1000)
 
 repr.to_csv(args.outputfile, header=None, index=None)
-
 
 
 print("Loading data from file {}.".format(args.inputfile))
