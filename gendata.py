@@ -1,5 +1,5 @@
 import os, sys
-import glob
+import random
 import argparse
 import numpy as np
 import pandas as pd
@@ -13,13 +13,16 @@ import linecache
 # scikit-learn OneHotEncoder, or any related automatic one-hot encoders.
 
 parser = argparse.ArgumentParser(description="Convert text to features")
-parser.add_argument("-N", "--ngram", metavar="N", dest="ngram", type=int, default=3, help="The length of ngram to be considered (default 3).")
+parser.add_argument("-N", "--ngram", metavar="N", dest="ngram", type=int, default=3,
+                    help="The length of ngram to be considered (default 3).")
 parser.add_argument("-S", "--start", metavar="S", dest="startline", type=int,
                     default=0,
                     help="What line of the input data file to start from. Default is 0, the first line.")
 parser.add_argument("-E", "--end", metavar="E", dest="endline",
                     type=int, default=None,
                     help="What line of the input data file to end on. Default is None, whatever the last line is.")
+parser.add_argument("-T", "--test", metavar="T", dest="testdata", type=int,
+                    help="The numbers of lines designated as the testdata.")
 parser.add_argument("inputfile", type=str,
                     help="The file name containing the text data.")
 parser.add_argument("outputfile", type=str,
@@ -28,13 +31,32 @@ parser.add_argument("outputfile", type=str,
 args = parser.parse_args()
 
 
-def get_tokens(file, start, end):
-    text = ""
-    if end is None:
-        end = 1000000
+def divide_input(file, start, end, nt):
+    text = []
+    #if end is None:
+        #end = 1000000
     for i in range(start, end):
-        text += linecache.getline(file, i)
-    raw_tokens = text.split(" ")
+        li = linecache.getline(file, i)
+        line = re.sub(r"\n", "", li)
+        text.append(line)
+    all_lines = " ".join(text)
+    randoms = []
+    for r in range(nt):
+        randoms.append(random.randint(0, len(text)))
+    test_li = []
+    train_li = []
+    for l,x in enumerate(text):
+        if l in randoms:
+            test_li.append(x)
+        else:
+            train_li.append(x)
+    test_lines = " ".join(test_li)
+    train_lines = " ".join(train_li)
+    return all_lines, test_lines, train_lines
+
+
+def get_list_of_tokens(string):
+    raw_tokens = string.split(" ")
     tokens_POS = []
     for t in raw_tokens:
         tokens_POS.append((t.split("/")))
@@ -42,11 +64,6 @@ def get_tokens(file, start, end):
     for t_p in tokens_POS:
         tokens.append(t_p[0])
     return tokens
-
-
-def create_ngrams(tokens, n):
-    n_grams = ngrams(tokens, n, pad_left=True, pad_right=False, left_pad_symbol="<s>", right_pad_symbol=None)
-    return list(n_grams)
 
 
 def create_vocabulary(wordlist):
@@ -67,6 +84,11 @@ def one_hot_transformer(vocabdict):
     return one_hot_vector_dict
 
 
+def create_ngrams(tokens, n):
+    n_grams = ngrams(tokens, n, pad_left=True, pad_right=False, left_pad_symbol="<s>", right_pad_symbol=None)
+    return list(n_grams)
+
+
 def create_one_hot_representations(ngrams_, vector_dict):
     all_vectors = []
     for el in ngrams_:
@@ -79,7 +101,7 @@ def create_one_hot_representations(ngrams_, vector_dict):
     return representation
 
 
-if args.startline > args.endline:
+"""if args.startline > args.endline:
     print("Starting line has to be smaller than ending line!")
 else:
     words = (get_tokens(args.inputfile, args.startline, args.endline))
@@ -111,4 +133,4 @@ print("Constructing {}-gram model.".format(args.ngram))
 print("Writing table to {}.".format(args.outputfile))
     
 # THERE ARE SOME CORNER CASES YOU HAVE TO DEAL WITH GIVEN THE INPUT
-# PARAMETERS BY ANALYZING THE POSSIBLE ERROR CONDITIONS.
+# PARAMETERS BY ANALYZING THE POSSIBLE ERROR CONDITIONS."""
