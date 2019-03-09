@@ -1,4 +1,5 @@
 import os, sys
+import re
 import random
 import argparse
 import numpy as np
@@ -33,8 +34,8 @@ args = parser.parse_args()
 
 def divide_input(file, start, end, nt):
     text = []
-    #if end is None:
-        #end = 1000000
+    if end is None:
+        end = 1000000
     for i in range(start, end):
         li = linecache.getline(file, i)
         line = re.sub(r"\n", "", li)
@@ -101,25 +102,42 @@ def create_one_hot_representations(ngrams_, vector_dict):
     return representation
 
 
-"""if args.startline > args.endline:
+if args.startline > args.endline and args.testdata > (args.endline - args.startline):
+    print("Starting line has to be smaller than ending line!",
+          "Number of lines desired in test must be smaller than selected lines through -S and -E")
+elif args.startline > args.endline:
     print("Starting line has to be smaller than ending line!")
+elif args.testdata > (args.endline - args.startline):
+    print("Number of lines desired in test must be smaller than selected lines through -S and -E")
 else:
-    words = (get_tokens(args.inputfile, args.startline, args.endline))
+    all_lines, test_lines, train_lines = divide_input(args.inputfile, args.startline, args.endline, args.testdata)
+
+
+corpus = get_list_of_tokens(all_lines)
+test = get_list_of_tokens(test_lines)
+train = get_list_of_tokens(train_lines)
 
 
 if args.ngram < 2:
     print("Ngrams must at least be trigrams!")
 else:
-    n_grams = create_ngrams(words, args.ngram)
+    n_grams_test = create_ngrams(test, args.ngram)
+    n_grams_train = create_ngrams(train, args.ngram)
 
-vocabulary = create_vocabulary(words)
+vocabulary = create_vocabulary(corpus)
 one_hot_vectors = one_hot_transformer(vocabulary)
-repr = pd.DataFrame(create_one_hot_representations(n_grams, one_hot_vectors))
+
+
+repr_test = pd.DataFrame(create_one_hot_representations(n_grams_test, one_hot_vectors))
+repr_train = pd.DataFrame(create_one_hot_representations(n_grams_train, one_hot_vectors))
+
 
 np.set_printoptions(suppress=True, linewidth=np.nan, threshold=np.nan)
 pd.set_option("display.width", 10**1000)
 
-repr.to_csv(args.outputfile, header=None, index=None)
+
+repr_test.to_csv(args.outputfile+".test.csv", header=None, index=None)
+repr_train.to_csv(args.outputfile+".train.csv", header=None, index=None)
 
 
 print("Loading data from file {}.".format(args.inputfile))
@@ -131,6 +149,4 @@ else:
 
 print("Constructing {}-gram model.".format(args.ngram))
 print("Writing table to {}.".format(args.outputfile))
-    
-# THERE ARE SOME CORNER CASES YOU HAVE TO DEAL WITH GIVEN THE INPUT
-# PARAMETERS BY ANALYZING THE POSSIBLE ERROR CONDITIONS."""
+
