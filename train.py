@@ -26,7 +26,7 @@ print("Writing table to {}.".format(args.modelfile))
 
 data = pd.read_csv(args.datafile, header=None)
 
-classes = data[data.columns[-1]].to_list()
+classes = data[data.columns[-1]].tolist()
 vectors = data.iloc[:, :-1]
 
 classifier = LogisticRegression(solver="lbfgs", multi_class="multinomial").fit(vectors, classes)

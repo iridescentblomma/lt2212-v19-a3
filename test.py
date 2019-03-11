@@ -28,7 +28,7 @@ print("Testing {}-gram model.".format(args.ngram))
 
 model = load(args.modelfile+".joblib")
 data = pd.read_csv(args.datafile, header=None)
-classes = data[data.columns[-1]].to_list()
+classes = data[data.columns[-1]].tolist()
 vectors = data.iloc[:, :-1]
 
 accuracy = model.score(vectors, classes)
