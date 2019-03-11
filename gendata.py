@@ -132,7 +132,7 @@ repr_test = pd.DataFrame(create_one_hot_representations(n_grams_test, one_hot_ve
 repr_train = pd.DataFrame(create_one_hot_representations(n_grams_train, one_hot_vectors))
 
 
-np.set_printoptions(suppress=True, linewidth=np.nan, threshold=np.nan)
+#np.set_printoptions(suppress=True, linewidth=np.nan, threshold=np.nan)
 pd.set_option("display.width", 10**1000)
 
 
