@@ -2,8 +2,9 @@ import os, sys
 import argparse
 import numpy as np
 import pandas as pd
-import pickle
 from sklearn.linear_model import LogisticRegression
+import pickle
+from joblib import dump, load
 
 # train.py -- Don't forget to put a reasonable amount code comments
 # in so that we better understand what you're doing when we grade!
@@ -19,6 +20,9 @@ parser.add_argument("modelfile", type=str,
 
 args = parser.parse_args()
 
+print("Loading data from file {}.".format(args.datafile))
+print("Training {}-gram model.".format(args.ngram))
+print("Writing table to {}.".format(args.modelfile))
 
 data = pd.read_csv(args.datafile, header=None)
 
@@ -27,15 +31,8 @@ vectors = data.iloc[:, :-1]
 
 classifier = LogisticRegression(solver="lbfgs", multi_class="multinomial").fit(vectors, classes)
 
-model = pickle.dumps(classifier)
 
-sys.stdout = open(args.modelfile, "w")
-print(model)
-
-
-print("Loading data from file {}.".format(args.datafile))
-print("Training {}-gram model.".format(args.ngram))
-print("Writing table to {}.".format(args.modelfile))
+dump(classifier, args.modelfile+".joblib")
 
 
 # YOU WILL HAVE TO FIGURE OUT SOME WAY TO INTERPRET THE FEATURES YOU CREATED.
