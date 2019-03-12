@@ -21,7 +21,7 @@ parser.add_argument("modelfile", type=str,
 args = parser.parse_args()
 
 print("Loading data from file {}.".format(args.datafile))
-print("Training {}-gram model.".format(args.ngram))
+#print("Training {}-gram model.".format(args.ngram))
 print("Writing table to {}.".format(args.modelfile))
 
 data = pd.read_csv(args.datafile, header=None)
