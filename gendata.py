@@ -104,7 +104,6 @@ def create_ngrams(tokens, n):
 def create_one_hot_representations(ngrams_, vector_dict, pos):
     all_vectors = []
     for el in ngrams_:
-        print(el)
         vector = []
         for w in el[:-1]:
             vector += vector_dict[w]
