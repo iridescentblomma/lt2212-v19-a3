@@ -28,6 +28,8 @@ parser.add_argument("inputfile", type=str,
                     help="The file name containing the text data.")
 parser.add_argument("outputfile", type=str,
                     help="The name of the output file for the feature table.")
+parser.add_argument("-P", "--POS", dest="POS", default=False, action="store_true",
+                    help="Create vector representations with POS with POS as label.")
 
 args = parser.parse_args()
 
@@ -56,15 +58,24 @@ def divide_input(file, start, end, nt):
     return all_lines, test_lines, train_lines
 
 
-def get_list_of_tokens(string):
+def get_list_of_tokens(string, pos):
     raw_tokens = string.split(" ")
-    tokens_POS = []
+    tokens_POS_li = []
     for t in raw_tokens:
-        tokens_POS.append((t.split("/")))
-    tokens = []
-    for t_p in tokens_POS:
-        tokens.append(t_p[0])
-    return tokens
+        tokens_POS_li.append((t.split("/")))
+    for p in tokens_POS_li:
+        if p[0] == "":
+            tokens_POS_li.remove(p)
+    if pos:
+        tokens_POS_tu = []
+        for tp in tokens_POS_li:
+            tokens_POS_tu.append(tuple(tp))
+        return tokens_POS_tu
+    else:
+        tokens = []
+        for t_p in tokens_POS_li:
+            tokens.append(t_p[0])
+        return tokens
 
 
 def create_vocabulary(wordlist):
@@ -90,13 +101,17 @@ def create_ngrams(tokens, n):
     return list(n_grams)
 
 
-def create_one_hot_representations(ngrams_, vector_dict):
+def create_one_hot_representations(ngrams_, vector_dict, pos):
     all_vectors = []
     for el in ngrams_:
+        print(el)
         vector = []
         for w in el[:-1]:
             vector += vector_dict[w]
-        vector.append(el[-1])
+        if pos:
+            vector.append(el[-1][1])
+        else:
+            vector.append(el[-1])
         all_vectors.append(vector)
     representation = np.array(all_vectors)
     return representation
@@ -113,9 +128,9 @@ else:
     all_lines, test_lines, train_lines = divide_input(args.inputfile, args.startline, args.endline, args.testdata)
 
 
-corpus = get_list_of_tokens(all_lines)
-test = get_list_of_tokens(test_lines)
-train = get_list_of_tokens(train_lines)
+corpus = get_list_of_tokens(all_lines, args.POS)
+test = get_list_of_tokens(test_lines, args.POS)
+train = get_list_of_tokens(train_lines, args.POS)
 
 
 if args.ngram < 2:
@@ -128,8 +143,9 @@ vocabulary = create_vocabulary(corpus)
 one_hot_vectors = one_hot_transformer(vocabulary)
 
 
-repr_test = pd.DataFrame(create_one_hot_representations(n_grams_test, one_hot_vectors))
-repr_train = pd.DataFrame(create_one_hot_representations(n_grams_train, one_hot_vectors))
+repr_test = pd.DataFrame(create_one_hot_representations(n_grams_test, one_hot_vectors, args.POS))
+repr_train = pd.DataFrame(create_one_hot_representations(n_grams_train, one_hot_vectors, args.POS))
+
 
 
 #np.set_printoptions(suppress=True, linewidth=np.nan, threshold=np.nan)
